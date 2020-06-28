@@ -16,26 +16,6 @@ public class Student {
 	private String queQuan;
 	private String ghiChu;
 
-	public Student(int stt, String mssv, String ho, String ten, String ngaySinh, String maLop, String tenLop,
-			String sdt, String email, String queQuan, String ghiChu) {
-		super();
-		this.stt = stt;
-		this.mssv = mssv;
-		this.ho = ho;
-		this.ten = ten;
-		this.ngaySinh = ngaySinh;
-		this.maLop = maLop;
-		this.tenLop = tenLop;
-		this.sdt = sdt;
-		this.email = email;
-		this.queQuan = queQuan;
-		this.ghiChu = ghiChu;
-	}
-
-	public Student() {
-		super();
-	}
-
 	public int getStt() {
 		return stt;
 	}

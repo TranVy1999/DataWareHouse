@@ -73,18 +73,17 @@ public class SCP {
 		try {
 			rs.next();
 			scp = new SCP();
-			scp.setHostName(rs.getString("hostname"));
+			scp.setHostName(rs.getString("host_name"));
 			scp.setPort(rs.getInt("port"));
 			scp.setUserName(rs.getString("user_name"));
 			scp.setPassword(rs.getString("password"));
-			scp.setSyncMustMatch(rs.getString("SyncMustMatch"));
-			scp.setRemotePath(rs.getString("remotePath"));
-			scp.setLocalPath(rs.getString("localPath"));
+			scp.setSyncMustMatch(rs.getString("sync_must_match"));
+			scp.setRemotePath(rs.getString("remote_path"));
+			scp.setLocalPath(rs.getString("local_path"));
 			return scp;
 		} catch (SQLException e) {
 			return null;
 		}
-
 	}
 
 	@Override
@@ -92,5 +91,6 @@ public class SCP {
 		return "SCP [hostName=" + hostName + ", port=" + port + ", userName=" + userName + ", password=" + password
 				+ ", syncMustMatch=" + syncMustMatch + ", remotePath=" + remotePath + ", localPath=" + localPath + "]";
 	}
+	
 
 }

@@ -141,14 +141,14 @@ public class Configuration {
 			conf.setErrorDir(rs.getString("error_dir"));
 			conf.setColmnList(rs.getString("column_list"));
 			conf.setDelimiter(rs.getString("delimiter"));
-			conf.setWarehouseTable(rs.getString("table_warehouse"));
-			conf.setStagingTable(rs.getString("table_staging"));
-			conf.setWarehouseDBName(rs.getString("name_db_warehouse"));
-			conf.setWarehouseUser(rs.getString("user_db_warehouse"));
-			conf.setWarehousePass(rs.getString("pass_db_warehouse"));
-			conf.setStagingDBName(rs.getString("name_db_staging"));
-			conf.setStagingUser(rs.getString("user_db_staging"));
-			conf.setStagingPass(rs.getString("pass_db_staging"));
+			conf.setWarehouseTable(rs.getString("warehouse_table"));
+			conf.setStagingTable(rs.getString("staging_table"));
+			conf.setWarehouseDBName(rs.getString("warehouse_db_name"));
+			conf.setWarehouseUser(rs.getString("warehouse_user"));
+			conf.setWarehousePass(rs.getString("warehouse_pass"));
+			conf.setStagingDBName(rs.getString("staging_db_name"));
+			conf.setStagingUser(rs.getString("staging_user"));
+			conf.setStagingPass(rs.getString("staging_pass"));
 			return conf;
 		} catch (SQLException e) {
 			e.printStackTrace();
