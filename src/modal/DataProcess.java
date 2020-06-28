@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
@@ -41,16 +40,16 @@ public class DataProcess {
 		return values;
 	}
 
-	public String readValuesTXT(File s_file, String delim,String f_name_logs) {
+	public String readValuesTXT(File s_file, String delim, String f_name_logs) {
 		String values = "";
 		try {
 			BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(s_file)));
 			String line = bReader.readLine();
 			if (Pattern.matches(NUMBER_REGEX, line.split(delim)[0])) { // Kiem tra xem co phan header khong
-				values += readLines(line+delim+f_name_logs, delim);
+				values += readLines(line + delim + f_name_logs, delim);
 			}
 			while ((line = bReader.readLine()) != null) {
-				values += readLines(line+delim+f_name_logs, delim);
+				values += readLines(line + delim + f_name_logs, delim);
 			}
 			bReader.close();
 			return values.substring(0, values.length() - 1);
@@ -61,7 +60,12 @@ public class DataProcess {
 		}
 	}
 
-	public String readValuesXLSX(File s_file,String f_name_logs,int countCell) {
+	public static void main(String[] args) {
+		DataProcess dp = new DataProcess();
+		System.out.println(dp.readValuesXLSX(new File("C:\\WAREHOUSE\\IMPORT_DIR\\sinhvien_sang_nhom11.xlsx")));
+	}
+
+	public String readValuesXLSX(File s_file) {
 		String values = "";
 		String value = "";
 		String delim_xlsx = "|";
@@ -75,12 +79,10 @@ public class DataProcess {
 				rows = sheet.iterator();// vi goi rows.next thi cur index =1, neu khong co header thi set lại cur index
 										// =0
 			}
-			int i = 0;
 			while (rows.hasNext()) {
 				Row row = rows.next();
 				Iterator<Cell> cells = row.cellIterator();
 				while (cells.hasNext()) {
-					i++;
 					Cell cell = cells.next();
 					CellType cellType = cell.getCellType();
 					switch (cellType) {
@@ -95,15 +97,14 @@ public class DataProcess {
 					case STRING:
 						value += cell.getStringCellValue() + delim_xlsx;
 						break;
+					case BLANK:
 					default:
+						value += delim_xlsx + " " + delim_xlsx;
 						break;
 					}
 				}
-				if(i<countCell) {
-					value+=" |";
-				}
-				i=0;
-				values += readLines(value+f_name_logs, delim_xlsx);
+				System.out.println(value);
+//				values += readLines(value, delim_xlsx);
 				value = "";
 			}
 			workBooks.close();
@@ -113,4 +114,5 @@ public class DataProcess {
 			return null;
 		}
 	}
+
 }

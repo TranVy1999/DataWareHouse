@@ -1,28 +1,27 @@
 package dao;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import modal.Configuration;
-import modal.Student;
 import util.ConnectionDB;
 
 public class ControlDB {
 	public static final String DATETIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
 	public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
 	public static LocalDateTime now = LocalDateTime.now();
-
-	public static final String CONTROL_DB_NAME = "jdbc:mysql://localhost:3306/dbcontrol";
+	
+	public static final String CONTROL_DB_NAME = "jdbc:mysql://localhost:3306/controldb";
 	public static final String CONTROL_DB_USER = "root";
-	public static final String CONTROL_DB_PASS = "123456";
+	public static final String CONTROL_DB_PASS = "";
 	static PreparedStatement pst = null;
 	static ResultSet rs = null;
 	static String sql;
+
+	
 
 	public static Configuration getConfig() {
 		Configuration conf = null;
@@ -57,7 +56,6 @@ public class ControlDB {
 			sql = "SELECT * FROM " + table_name;
 			pst = ConnectionDB.createConnection(db_name, user_name, password).prepareStatement(sql);
 			rs = pst.executeQuery();
-			System.out.println(db_name + "" + user_name + password + table_name);
 			return rs;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -70,37 +68,6 @@ public class ControlDB {
 			String column_list, String values) throws SQLException {
 		sql = "INSERT INTO " + table_name + "(" + column_list + ") VALUES " + values;
 		pst = ConnectionDB.createConnection(db_name, user_name, password).prepareStatement(sql);
-		int result = pst.executeUpdate();
-		try {
-			if (pst != null)
-				pst.close();
-			if (rs != null)
-				rs.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return result > 0;
-	}
-
-	public static boolean insertValuesDBStagingToDBWareHouse(String db_name, String user_name, String password,
-			String table_name, String column_list, Student stu) throws SQLException, Exception {
-		sql = "INSERT INTO " + table_name + "(" + column_list + ") VALUES " + "(?,?,?,?,?,?,?,?,?,?,?)";
-		String pattern = "dd/MM/yyyy";
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-
-		Date date = (Date) simpleDateFormat.parse(stu.getNgaySinh());
-		pst = ConnectionDB.createConnection(db_name, user_name, password).prepareStatement(sql);
-		pst.setInt(1, stu.getStt());
-		pst.setString(2, stu.getMssv());
-		pst.setString(3, stu.getHo());
-		pst.setString(4, stu.getTen());
-		pst.setDate(5, date);
-		pst.setString(6, stu.getMaLop());
-		pst.setString(7, stu.getTenLop());
-		pst.setString(8, stu.getSdt());
-		pst.setString(9, stu.getEmail());
-		pst.setString(10, stu.getQueQuan());
-		pst.setString(11, stu.getGhiChu());
 		int result = pst.executeUpdate();
 		try {
 			if (pst != null)

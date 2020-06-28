@@ -2,7 +2,6 @@ package modal;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
 
 public class Logs {
 	private String fileName;

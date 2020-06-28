@@ -59,7 +59,7 @@ public class DataWarehouse {
 	/*
 	 * III. Tiến hành ghi các file có file_status = SU vào bảng student trong DB
 	 * warehouse ### 1. Vào bảng Logs (trong DB control_db) đọc tất cả các records,
-	 * nếu rcd nều có file_status = SU thì tiến hành move dữ liệu từ bảng student
+	 * nếu rcd nào có file_status = SU thì tiến hành move dữ liệu từ bảng student
 	 * (trong DB db_staging) qua bảng student (trong DB warehouse) ### 2. Quá trình
 	 * di chuyển hoàn tất -> Move các file đó vào thư mục C:\WAREHOUSE\SUCCESS_DIR
 	 * -> Kết thúc chu trình.
@@ -75,49 +75,52 @@ public class DataWarehouse {
 
 //I.
 	public void downloadFile() {
-
 	}
 
 	public void checkFileStatus() {
 		ResultSet allRecordLogs = ControlDB.selectAllField(ControlDB.CONTROL_DB_NAME, ControlDB.CONTROL_DB_USER,
 				ControlDB.CONTROL_DB_PASS, "logs");
-		Student stu;
 		try {
 			File file = null;
 			while (allRecordLogs.next()) {
 				allRecordLogs.getString("file_name");
 				if (allRecordLogs.getString("file_status").equals("ER")) {
+//					System.out.println(allRecordLogs.getString("file_name"));
+					String values = "";
+					// Tien hanh ghi toàn bộ nội dung của file đó vào table student (trong DB
+					// db_staging)
+					// -> đồng thời chuyển trạng thái file đó thành TR
+					file = new File(IMPORT_DIR + File.separator + allRecordLogs.getString("file_name"));
+					if (!file.exists())
+						break;
+					if (file.getPath().endsWith(EXT_EXCEL)) {
+//						StringTokenizer str = new StringTokenizer(COLUMN_LIST + ",file_name", DELIM);
+
+						values = d_process.readValuesXLSX(file);
+					} else if (file.getPath().endsWith(EXT_TEXT)) {
+						values = d_process.readValuesTXT(file, DELIM, file.getName());
+					} else if (file.getPath().endsWith(EXT_CSV)) {
+						// Tu Tu lam
+					}
+					try {
+						// extract to db_staging
+						if (ControlDB.insertValues(STAGING_DB_NAME, STAGING_USER, STAGING_PASS, STAGING_TABLE,
+								COLUMN_LIST + ",file_name", values)) {
+							// change status in table logs
+							ControlDB.updateLogs(ControlDB.CONTROL_DB_NAME, ControlDB.CONTROL_DB_USER,
+									ControlDB.CONTROL_DB_PASS, allRecordLogs.getInt("id"), "TR");
+						}
+					} catch (SQLException e) {
+						ControlDB.updateLogs(ControlDB.CONTROL_DB_NAME, ControlDB.CONTROL_DB_USER,
+								ControlDB.CONTROL_DB_PASS, allRecordLogs.getInt("id"), "ERR");
+						moveFile(file, ER_DIR);
+						continue;
+					}
 
 				} else if (allRecordLogs.getString("file_status").equals("TR")) {
-					ResultSet allValueDB_Staging = ControlDB.selectAllField("jdbc:mysql://localhost:3306/db_staging",
-							ControlDB.CONTROL_DB_USER, ControlDB.CONTROL_DB_PASS, "sinhvien");
-					while (allValueDB_Staging.next()) {
-						int stt = Integer.parseInt(allValueDB_Staging.getString("stt"));
-						String mssv = allValueDB_Staging.getString("mssv");
-						String ho = allValueDB_Staging.getString("ho");
-						String ten = allValueDB_Staging.getString("ten");
-						String ngaySinh = allValueDB_Staging.getString("ngay_sinh");
-						String maLop = allValueDB_Staging.getString("ma_lop");
-						String tenLop = allValueDB_Staging.getString("ten_lop");
-						String sdt = allValueDB_Staging.getString("sdt");
-						String email = allValueDB_Staging.getString("email");
-						String queQuan = allValueDB_Staging.getString("que_quan");
-						String ghiChu = allValueDB_Staging.getString("ghi_chu");
-						stu = new Student(stt, mssv, ho, ten, ngaySinh, maLop, tenLop, sdt, email, queQuan, ghiChu);
-						try {
-							if (ControlDB.insertValuesDBStagingToDBWareHouse("jdbc:mysql://localhost:3306/sinhvien",
-									ControlDB.CONTROL_DB_USER, ControlDB.CONTROL_DB_PASS, "sinhvien", COLUMN_LIST,
-									stu)) {
-								ControlDB.updateLogs(ControlDB.CONTROL_DB_NAME, ControlDB.CONTROL_DB_USER,
-										ControlDB.CONTROL_DB_PASS, allRecordLogs.getInt("id"), "SU");
-							}
-						} catch (Exception e) {
-							ControlDB.updateLogs(ControlDB.CONTROL_DB_NAME, ControlDB.CONTROL_DB_USER,
-									ControlDB.CONTROL_DB_PASS, allRecordLogs.getInt("id"), "ERR");
-							moveFile(file, ER_DIR);
-							continue;
-						}
-					}
+					// Trans
+
+					// Update logs (file_status | count_line,file_timestamp)
 
 				} else if (allRecordLogs.getString("file_status").equals("SU")) {
 
@@ -154,5 +157,4 @@ public class DataWarehouse {
 			file.delete();
 		}
 	}
-
 }
